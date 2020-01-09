@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using HinosPackage.Runtime.Util;
 using UnityEngine;
 
-public class GridGenerator : MonoBehaviour {
+public class GridGenerator : Singleton<GridGenerator> {
     public int width, length;
-    public Transform player;
 
     public GridMap GridMap { get; private set; }
 
@@ -33,13 +33,6 @@ public class GridGenerator : MonoBehaviour {
         foreach (Cell cell in GridMap.Cells) {
             Gizmos.color = (cell.Walkable) ? Color.green : Color.red;
             Gizmos.DrawWireCube(cell.Centroid, new Vector3(1f,0.1f,1f));
-        }
-            
-        //debug get cell
-        if (player) {
-            Cell cell = GridMap.GetCellFromWorldPosition(player.position);
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawCube(cell.Centroid, Vector3.one * 0.5f);
         }
     }
 }
