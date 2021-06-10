@@ -6,31 +6,27 @@ using UnityEngine;
 public class GridGenerator : Singleton<GridGenerator> {
     public int width, length;
 
-    public GridMap GridMap { get; private set; }
+    private GridMap gridMap;
+    private VertexMap vertexMap;
+    private MeshData meshData;
 
     private void Start() {
-        VertexMap vertexMap = VertexMap.GenerateVertexMap(width, length);
-        GridMap = GridMap.GenerateGrid(vertexMap);
-        GenerateMesh();
+        vertexMap = VertexMap.GenerateVertexMap(width, length);
+        gridMap = GridMap.GenerateGrid(vertexMap);
+        meshData = new MeshData(vertexMap);
+    }
+    
+    private void OnDrawGizmos() { 
+        DrawGrid();
     }
 
-    public void GenerateMesh() {
-        MeshData meshData = MeshData.GenerateMeshData(GridMap);
-        Mesh mesh = new Mesh{vertices = GridMap.VertexMap.Vertices, triangles = meshData.Triangles};
-        mesh.RecalculateNormals();
-        GetComponent<MeshFilter>().sharedMesh = mesh;
-        GetComponent<MeshCollider>().sharedMesh = mesh;
-    }
-
-    private void OnDrawGizmos() { //mostly debug functions
-        if (GridMap == null) return;
+    private void DrawGrid() {
+        if (gridMap == null) return;
         
-        //debug vertices
         Gizmos.color = Color.black;
-        foreach (var vertex in GridMap.VertexMap.Vertices) { Gizmos.DrawSphere(vertex, 0.1f); }
+        foreach (var vertex in gridMap.VertexMap.Vertices) { Gizmos.DrawSphere(vertex, 0.1f); }
         
-        //debug grid
-        foreach (Cell cell in GridMap.Cells) {
+        foreach (var cell in gridMap.Cells) {
             Gizmos.color = (cell.Walkable) ? Color.green : Color.red;
             Gizmos.DrawWireCube(cell.Centroid, new Vector3(1f,0.1f,1f));
         }
